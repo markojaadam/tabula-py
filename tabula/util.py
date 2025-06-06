@@ -148,7 +148,7 @@ class TabulaOption:
     stream: bool = False
     password: Optional[str] = None
     silent: Optional[bool] = None
-    columns: Optional[Sequence[float]] = None
+    columns: Optional[Union[Sequence[float], Sequence[Sequence[float]]]] = None
     relative_columns: bool = False
     format: Optional[str] = None
     batch: Optional[str] = None
@@ -236,11 +236,22 @@ class TabulaOption:
             __options += ["--outfile", self.output_path]
 
         if self.columns:
-            if list(self.columns) != sorted(self.columns):
-                raise ValueError("columns option should be sorted")
+            if isinstance(self.columns, (list,tuple)):
+                if any(type(e) in [list, tuple] for e in self.columns):
+                    for e in self.columns:
+                        if list(e) != sorted(e):
+                            raise ValueError(
+                                "columns option should be sorted for each column"
+                            )
 
-            __columns = _format_with_relative(self.columns, self.relative_columns)
-            __options += ["--columns", __columns]
+                        __columns = _format_with_relative(e, self.relative_columns)
+                        __options += ["--columns", __columns]
+                else:
+                    if list(self.columns) != sorted(self.columns):
+                        raise ValueError("columns option should be sorted")
+
+                    __columns = _format_with_relative(self.columns, self.relative_columns)
+                    __options += ["--columns", __columns]
 
         if self.password:
             __options += ["--password", self.password]
