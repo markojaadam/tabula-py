@@ -236,7 +236,7 @@ class TabulaOption:
             __options += ["--outfile", self.output_path]
 
         if self.columns:
-            if isinstance(self.columns, (list,tuple)):
+            if isinstance(self.columns, (list, tuple)):
                 if any(type(e) in [list, tuple] for e in self.columns):
                     for e in self.columns:
                         if list(e) != sorted(e):
